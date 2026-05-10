@@ -9,20 +9,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Extract Project
-        run: |
-          unzip boycash_project.zip
-          PROJECT_ROOT=$(find . -name "package.json" -exec dirname {} \;)
-          cp -r $PROJECT_ROOT/* .
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
-        run: |
-          npm install --force
-          npm install @capacitor/android
+        run: unzip boycash_project.zip
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
