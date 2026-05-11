@@ -20,15 +20,14 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Accept Licenses
-        run: yes | sdkmanager --licenses || true
-
-      - name: Build Android
+      - name: Force Fix and Build
         run: |
-          GRADLE_PATH=$(find . -name gradlew | head -n 1)
-          chmod +x "$GRADLE_PATH"
-          cd $(dirname "$GRADLE_PATH")
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          ANDROID_DIR=$(find . -name "build.gradle" -exec dirname {} \; | head -n 1)
+          cd "$ANDROID_DIR"
+          rm -rf gradlew gradlew.bat gradle/wrapper
+          gradle wrapper --gradle-version 8.0
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
 
       - name: Upload APK
         if: success()
