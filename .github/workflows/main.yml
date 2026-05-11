@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Extract Project
-        run: unzip boycash_project.zip
+        run: unzip -o boycash_project.zip
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -20,18 +20,16 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build With System Gradle
+      - name: Root Build
         run: |
-          # Find the directory that contains settings.gradle or build.gradle
           ROOT_DIR=$(find . -name "settings.gradle" -exec dirname {} \; | head -n 1)
           if [ -z "$ROOT_DIR" ]; then
             ROOT_DIR=$(find . -name "build.gradle" -exec dirname {} \; | head -n 1)
           fi
-          
           cd "$ROOT_DIR"
-          
-          # Use the system-installed gradle instead of the local gradlew
-          gradle assembleDebug --stacktrace
+          gradle wrapper --gradle-version 8.0
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         if: success()
