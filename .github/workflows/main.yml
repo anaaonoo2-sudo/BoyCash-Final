@@ -19,19 +19,23 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'gradle'
 
-      - name: Root Solution Build
+      - name: Build Android
         run: |
-          # 1. Find the real android directory
-          ANDROID_PATH=$(find . -name "build.gradle" -exec dirname {} \; | head -n 1)
-          cd "$ANDROID_PATH"
+          # Search for the directory containing gradlew
+          GRADLEW_PATH=$(find . -name gradlew -print -quit)
           
-          # 2. Fix permissions and environment
-          chmod +x gradlew || true
+          if [ -z "$GRADLEW_PATH" ]; then
+            echo "Error: gradlew not found in the ZIP file"
+            exit 1
+          fi
           
-          # 3. Clean and Build from scratch
-          ./gradlew clean assembleDebug --no-daemon --stacktrace
+          # Move to that directory
+          cd $(dirname "$GRADLEW_PATH")
+          
+          # Fix permissions and build
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
 
       - name: Upload APK
         if: success()
