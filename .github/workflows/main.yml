@@ -17,15 +17,20 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Accept Licenses
+        run: yes | sdkmanager --licenses || true
+
       - name: Build Android
         run: |
           GRADLE_PATH=$(find . -name gradlew | head -n 1)
           chmod +x "$GRADLE_PATH"
           cd $(dirname "$GRADLE_PATH")
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --stacktrace --no-daemon
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: BoyCash-App
           path: "**/app-debug.apk"
+          
