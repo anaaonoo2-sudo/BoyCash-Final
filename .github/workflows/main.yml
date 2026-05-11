@@ -17,7 +17,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install and Sync
         run: |
@@ -36,7 +36,7 @@ jobs:
         run: |
           ANDROID_DIR=$(find . -name "build.gradle" -not -path "*/node_modules/*" | head -n 1)
           cd $(dirname "$ANDROID_DIR")
-          gradle wrapper --gradle-version 8.2
+          gradle wrapper --gradle-version 8.7
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
