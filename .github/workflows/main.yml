@@ -19,12 +19,13 @@ jobs:
 
       - name: Build Android
         run: |
-          cd android
-          chmod +x gradlew
+          GRADLE_PATH=$(find . -name gradlew | head -n 1)
+          chmod +x "$GRADLE_PATH"
+          cd $(dirname "$GRADLE_PATH")
           ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: BoyCash-App
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: "**/app-debug.apk"
