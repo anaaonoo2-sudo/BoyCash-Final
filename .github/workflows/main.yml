@@ -8,34 +8,30 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Extract Project
+      - name: Unzip
         run: unzip -o boycash_project.zip
 
-      - name: Set up JDK 17
+      - name: JDK
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Ultimate Build
+      - name: Build
         run: |
-          find . -name "gradlew" -exec chmod +x {} \;
-          GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
-          if [ -z "$GRADLEW_PATH" ]; then
-            ROOT_DIR=$(find . -name "build.gradle" -exec dirname {} \; | head -n 1)
-            cd "$ROOT_DIR"
-            gradle wrapper --gradle-version 8.0
-            chmod +x gradlew
-            ./gradlew assembleDebug --no-daemon
-          else
-            cd $(dirname "$GRADLEW_PATH")
-            ./gradlew assembleDebug --no-daemon
+          PROJECT_ROOT=$(find . -name "settings.gradle" -exec dirname {} \; | head -n 1)
+          if [ -z "$PROJECT_ROOT" ]; then
+            PROJECT_ROOT=$(find . -name "build.gradle" -exec dirname {} \; | head -n 1)
           fi
+          cd "$PROJECT_ROOT"
+          gradle wrapper
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
 
-      - name: Upload APK
+      - name: Upload
         if: success()
         uses: actions/upload-artifact@v4
         with:
