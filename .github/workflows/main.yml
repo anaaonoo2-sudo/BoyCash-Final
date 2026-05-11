@@ -20,21 +20,25 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build Android
+      - name: Ultimate Build
         run: |
-          ROOT_DIR=$(find . -name "build.gradle" -exec dirname {} \; | head -n 1)
-          if [ -z "$ROOT_DIR" ]; then
-            exit 1
+          find . -name "gradlew" -exec chmod +x {} \;
+          GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
+          if [ -z "$GRADLEW_PATH" ]; then
+            ROOT_DIR=$(find . -name "build.gradle" -exec dirname {} \; | head -n 1)
+            cd "$ROOT_DIR"
+            gradle wrapper --gradle-version 8.0
+            chmod +x gradlew
+            ./gradlew assembleDebug --no-daemon
+          else
+            cd $(dirname "$GRADLEW_PATH")
+            ./gradlew assembleDebug --no-daemon
           fi
-          cd "$ROOT_DIR"
-          gradle wrapper --gradle-version 8.0
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: BoyCash-App
-          path: "**/build/outputs/apk/debug/*.apk"
+          path: "**/*.apk"
           
