@@ -19,15 +19,19 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'gradle'
 
-      - name: Force Fix and Build
+      - name: Root Solution Build
         run: |
-          ANDROID_DIR=$(find . -name "build.gradle" -exec dirname {} \; | head -n 1)
-          cd "$ANDROID_DIR"
-          rm -rf gradlew gradlew.bat gradle/wrapper
-          gradle wrapper --gradle-version 8.0
-          chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
+          # 1. Find the real android directory
+          ANDROID_PATH=$(find . -name "build.gradle" -exec dirname {} \; | head -n 1)
+          cd "$ANDROID_PATH"
+          
+          # 2. Fix permissions and environment
+          chmod +x gradlew || true
+          
+          # 3. Clean and Build from scratch
+          ./gradlew clean assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         if: success()
